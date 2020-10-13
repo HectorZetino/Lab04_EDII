@@ -11,7 +11,7 @@ namespace BibliotecaDeClases.LZW
     public class LZW
     {
         private static string rutaDirectorioBase = Environment.CurrentDirectory;
-
+        #region Compresion
         public static void Compresion(IFormFile Archivo, string nombre) {
             if (!Directory.Exists(Path.Combine(rutaDirectorioBase, "Compressions")))
             {
@@ -102,5 +102,82 @@ namespace BibliotecaDeClases.LZW
                 }
             }
         }
+        #endregion
+
+        #region Decompresion
+        public static string Decompresion(IFormFile Archivo, string nombre) {
+            if (!Directory.Exists(Path.Combine(rutaDirectorioBase, "Decompressions")))
+            {
+                Directory.CreateDirectory(Path.Combine(rutaDirectorioBase, "Decompressions"));
+            }
+            using (var reader = new BinaryReader(Archivo.OpenReadStream())) {
+                using (var sw = new FileStream(Path.Combine(rutaDirectorioBase, "Decompressions", nombre), FileMode.OpenOrCreate)){
+                    using (var writer = new BinaryWriter(sw)) {
+                        var DiccionarioLetras = new Dictionary<int, string>();
+                        var bufferLength = 10000;
+                        var byteBuffer = new byte[bufferLength];
+                        byteBuffer = reader.ReadBytes(8);
+
+                        var CantidadDiccionario = Convert.ToInt32(Encoding.UTF8.GetString(byteBuffer));
+                        for (int i = 0; i < CantidadDiccionario; i++)
+                        {
+                            byteBuffer = reader.ReadBytes(1);
+                            var Letra = Convert.ToChar(byteBuffer[0]).ToString();
+                            DiccionarioLetras.Add(DiccionarioLetras.Count() + 1, Letra);
+                        }
+                        byteBuffer = reader.ReadBytes(1);
+                        var CantidadBits = Convert.ToInt32(byteBuffer[0]);
+                        var AuxAnterior = string.Empty;
+                        var AuxActual = string.Empty;
+                        var Aux = string.Empty;
+                        var Primer = true;
+                        var bufferDeEscritura = new List<byte>();
+                        while (reader.BaseStream.Position != reader.BaseStream.Length)
+                        {
+                            byteBuffer = reader.ReadBytes(bufferLength);
+                            foreach (var item in byteBuffer)
+                            {
+                                Aux += Convert.ToString(item, 2).PadLeft(8, '0');
+                                while (Aux.Length >= CantidadBits)
+                                {
+                                    var NuevoNumero = Convert.ToInt32(Aux.Substring(0, CantidadBits), 2);
+                                    if (NuevoNumero != 0)
+                                    {
+                                        if (Primer)
+                                        {
+                                            Primer = false;
+                                            AuxAnterior = DiccionarioLetras[NuevoNumero];
+                                            bufferDeEscritura.Add(Convert.ToByte(Convert.ToChar(AuxAnterior)));
+                                        }
+                                        else
+                                        {
+                                            if (NuevoNumero > DiccionarioLetras.Count)
+                                            {
+                                                AuxActual = AuxAnterior + AuxAnterior.First();
+                                                DiccionarioLetras.Add(DiccionarioLetras.Count + 1, AuxActual);
+                                            }
+                                            else
+                                            {
+                                                AuxActual = DiccionarioLetras[NuevoNumero];
+                                                DiccionarioLetras.Add(DiccionarioLetras.Count + 1, $"{AuxAnterior}{AuxActual.First()}");
+                                            }
+                                            foreach (var Letra in AuxActual)
+                                            {
+                                                bufferDeEscritura.Add(Convert.ToByte(Letra));
+                                            }
+                                            AuxAnterior = AuxActual;
+                                        }
+                                    }
+                                    Aux = Aux.Substring(CantidadBits);
+                                }
+                            }
+                        }
+                        writer.Write(bufferDeEscritura.ToArray());
+                    }
+                }
+            }
+            return Path.Combine(rutaDirectorioBase, "Decompressions", nombre);
+        }
+        #endregion
     }
 }
