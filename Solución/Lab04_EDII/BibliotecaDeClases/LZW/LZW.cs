@@ -82,7 +82,7 @@ namespace BibliotecaDeClases.LZW
 
                         foreach (var item in ListaCaracteres)
                         {
-                            Temp = item;
+                            Temp += item;
                             if (Temp.Length >= 8)
                             {
                                 var Max = Temp.Length / 8;
