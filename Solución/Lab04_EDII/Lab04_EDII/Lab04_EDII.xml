@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Lab04_EDII</name>
+    </assembly>
+    <members>
+        <member name="M:Lab04_EDII.Controllers.apiController.Post(Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            Recibe un archivo de texto que se deberá comprimir
+            </summary>
+            <param name="file">Archvo de texto a comprimir</param>
+            <param name="name">Nuevo nombre del archivo a comprimir</param>
+        </member>
+        <member name="M:Lab04_EDII.Controllers.apiController.Post(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Recibe un archivo .lzw que se deberá descomprimir
+            </summary>
+            <param name="file">Archivo con extension .lzw que se descomprimira</param>
+        </member>
+        <member name="M:Lab04_EDII.Controllers.apiController.Get">
+            <summary>
+            Devuelve un JSON con el listado de todas las compresiones
+            </summary>
+            <returns>JSON con las compresiones realizadas</returns>
+        </member>
+        <member name="M:Lab04_EDII.Controllers.apiController.GetAction">
+            <summary>
+            Comprobacion de funcionamiento correcto del API
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

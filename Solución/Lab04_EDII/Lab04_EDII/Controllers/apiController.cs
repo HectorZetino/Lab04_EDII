@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using BibliotecaDeClases.LZW;
 using System.IO;
 using Lab04_EDII.Models;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lab04_EDII.Controllers
 {
@@ -14,8 +15,14 @@ namespace Lab04_EDII.Controllers
     [ApiController]
     public class apiController : ControllerBase
     {
+        /// <summary>
+        /// Recibe un archivo de texto que se deberá comprimir
+        /// </summary>
+        /// <param name="file">Archvo de texto a comprimir</param>
+        /// <param name="name">Nuevo nombre del archivo a comprimir</param>
         [HttpPost("compress/{name}")]
-        public void Post([FromForm]IFormFile file, string name) {
+        public string Post(IFormFile file, string name)
+        {
             LZW.Compresion(file, name);
             var NewFile = new FileInfo(Path.Combine(Environment.CurrentDirectory, "Compressions", $"{name}.lzw"));
             CompressionsCollections.EscrituraCompresiones(
@@ -28,9 +35,14 @@ namespace Lab04_EDII.Controllers
                     Factor_De_Compresion = (double)file.Length / (double)NewFile.Length,
                     Porcentaje = 100 - (((double)NewFile.Length / (double)file.Length) * 100) // correccion del anterior (lab03), se muestra el porcentaje de reduccion real 
                 });
+            return "Archivo Compreso en :"+ NewFile.ToString();
         }
+        /// <summary>
+        /// Recibe un archivo .lzw que se deberá descomprimir
+        /// </summary>
+        /// <param name="file">Archivo con extension .lzw que se descomprimira</param>
         [HttpPost("decompress")]
-        public void Post([FromForm]IFormFile file) {
+        public string Post(IFormFile file) {
             var HistorialCompresiones = CompressionsCollections.HistorialCompresiones();
             var OriginalName = HistorialCompresiones.Find(c => Path.GetFileNameWithoutExtension(c.Nombre_Del_Archivo_Comprimido) == Path.GetFileNameWithoutExtension(file.FileName));
             var path = LZW.Decompresion(file, OriginalName.Nombre_Del_Archivo_Original);
@@ -45,7 +57,12 @@ namespace Lab04_EDII.Controllers
                     Factor_De_Compresion = 0,
                     Porcentaje = 0
                 });
+            return "Archivo Decompreso en :" + NewFile.ToString();
         }
+        /// <summary>
+        /// Devuelve un JSON con el listado de todas las compresiones
+        /// </summary>
+        /// <returns>JSON con las compresiones realizadas</returns>
         [HttpGet("compressions")]
         public List<CompressionsCollections> Get() {
             var ListadoCompresiones = new List<CompressionsCollections>();
@@ -84,6 +101,10 @@ namespace Lab04_EDII.Controllers
             }
             return ListadoCompresiones;
         }
+        /// <summary>
+        /// Comprobacion de funcionamiento correcto del API
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult GetAction() {
             return Ok();
