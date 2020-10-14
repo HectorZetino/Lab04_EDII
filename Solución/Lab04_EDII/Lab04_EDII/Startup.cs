@@ -31,7 +31,7 @@ namespace Lab04_EDII
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Lab04_EDII", Version = "v1", Description = "<center><h1>Compresion LZW</h1><h2>Hector Zetino 1295617<br>Lester Garcia 1003115</h2><h3>Funcionalidad Completa desde Swagger!!!!</h3></center>" });
-                var filePath = Path.Combine(System.AppContext.BaseDirectory, "Lab04_EDII.xml");
+                var filePath = Path.Combine(Environment.CurrentDirectory, "Lab04_EDII.xml");
                 c.IncludeXmlComments(filePath);
             });
         }
