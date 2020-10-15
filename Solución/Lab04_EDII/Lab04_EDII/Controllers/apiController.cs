@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BibliotecaDeClases.LZW;
 using System.IO;
 using Lab04_EDII.Models;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Lab04_EDII.Controllers
 {
